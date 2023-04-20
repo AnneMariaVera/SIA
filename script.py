@@ -50,7 +50,7 @@ ax[0].plot(bed[1:len(bed)],surface[1:len(surface)])
 ax[1].plot(bed[1:len(bed)],v_x,"r.",markersize=1)
 # label axes
 ax[0].set( ylabel = r"$h\, [m]$")
-ax[1].set(xlabel = r"$x\, [m]$", ylabel = r"$v_x\,[m]$")
+ax[1].set(xlabel = r"$x\, [m]$", ylabel = r"$v_x\,[ma^{-1}]$")
 # switch off borders in plot
 ax[0].spines['top'].set_visible(False)
 ax[0].spines['right'].set_visible(False)
