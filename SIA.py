@@ -43,8 +43,8 @@ def height(h,delta_x,delta_t,n,rho,A,g):
 
 def solution(h,delta_x,delta_t,t_0,N,n,rho,A,g):
     # save initial condition in solution list sol
-    sol = [h]
-    
+    sol_h = [h]
+    sol_v = [velocity(h,delta_x,n,rho,A,g)]
     # First time step
     surface = height(h, delta_x, delta_t, n, rho, A, g)
     time = t_0 + delta_t
@@ -52,13 +52,15 @@ def solution(h,delta_x,delta_t,t_0,N,n,rho,A,g):
     #TODO: boundary condition
     # h=0 at the left and right boundary right now
     surface = np.append(np.append([0],surface),[0])
-    sol.append(surface)
+    sol_h.append(surface)
+    sol_v.append(velocity(surface, delta_x, n, rho, A, g))
     
     # Iterate through time and append solution to sol list
     while time<=t_0+(N-1)*delta_t:
         time = time + delta_t
         surface = height(surface, delta_x, delta_t, n, rho, A, g)
         surface = np.append(np.append([0],surface),[0])
-        sol.append(surface)
+        sol_h.append(surface)
+        sol_v.append(velocity(surface, delta_x, n, rho, A, g))
         
-    return sol
+    return [sol_h,sol_v]
