@@ -26,8 +26,9 @@ import numpy as np
 
 def velocity(h,delta_x,n,rho,A,g): 
     # Calculate velocity at the top
-    v_x = np.array([2*(rho*g)**3*((h[i-1]-h[i])/delta_x)**3*A*1/4*
-                    (h[i])**4 for i in range(1,np.size(h))])
+    #TODO: change to n!!!
+    v_x = np.array([2*(rho*g)**n*((h[i-1]-h[i])/delta_x)**n*A*1/(n+1)*
+                    (h[i])**(n+1) for i in range(1,np.size(h))])
     return v_x
 
 def height(h,delta_x,delta_t,n,rho,A,g):
