@@ -1,2 +1,4 @@
 commands.txt
 Literature
+__pycache__
+.ipynb_checkpoints
