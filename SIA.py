@@ -10,7 +10,10 @@ Overview:
                 2. the bed is constant along the x axis.
         
 Input variables: 
-    h           Heights of the ice sheet 
+    base        Location of the base of the ice sheet
+    surface     Location of the surface of the ice sheet 
+    boundary    contains information about the boundary condition
+    a           Accumultaion rate
     delta_x     Size of the grid in x dir.
     t_0         start time
     N           Number of time steps
@@ -20,48 +23,49 @@ Input variables:
     A           flow rate factor (Temp. dependent)
     g           gravity 
 """
-      
+# TODO: Add boundary condition and base    
+# TODO: Add accumulation
+# TODO: Adjust for Flux
 
 import numpy as np
 
-def velocity(h,delta_x,n,rho,A,g): 
+def velocity(base,surface,boundary,delta_x,n,rho,A,g): 
     # Calculate velocity at the top
-    #TODO: change to n!!!
-    v_x = np.array([2*(rho*g)**n*((h[i-1]-h[i])/delta_x)**n*A*1/(n+1)*
-                    (h[i])**(n+1) for i in range(1,np.size(h))])
+    H = surface-base
+    # velocity at the base is zero
+    v_x = -2*A/(n+2)*(rho*g)**n*np.array(
+        [((surface[i]-surface[i-1])/delta_x)**n*H[i]**(n+1) 
+           for i in range(1,len(surface))])
     return v_x
 
-def height(h,delta_x,delta_t,n,rho,A,g):
-    # Diffusion coef. 
-    D = [2*A/(n+2)*(rho*g)**n*((h[i+1]-h[i])/delta_x)**(n-1)*
-         ((h[i]+h[i+1])/2)**(n+2) for i in range(0,np.size(h)-1)]
+def flux(base,surface,boundary,delta_x,delta_t,n,rho,A,g):
+    H = surface-base
+    Q = 2*A/(n+2)*(rho*g)**n*np.array(
+        [((surface[i+1]-surface[i])/delta_x)**n*((H[i+1]+H[i])/2)**(n+2) 
+         for i in range(0,len(surface)-1)])  
+    Q=np.append(boundary[0],Q)
+    Q=np.append(Q,boundary[1])
+    return Q
     
-    # height 
-    h_new = [h[i]+delta_t/(delta_x)**2*(D[i]*(h[i+1]-h[i])-
-                        D[i-1]*(h[i]-h[i-1])) for i in range(1,np.size(h)-1)]
-    
-    return np.array(h_new)
 
-def solution(h,delta_x,delta_t,t_0,N,n,rho,A,g):
+def height(base,surface,boundary,a,delta_x,delta_t,n,rho,A,g):
+    Q = flux(base,surface,boundary,delta_x,delta_t,n,rho,A,g)
+    h_new = np.array([surface[i]+delta_t/delta_x*(Q[i+1]-Q[i]) 
+                    for i in range(0,len(Q)-1)])+delta_t*a
+    h_new = [0 if h_new[i]-base[i]<0 else h_new[i] for i in range(0,len(base))] 
+    return h_new
+
+def solution(base,surface,boundary,a,delta_x,delta_t,t_0,N,n,rho,A,g):
     # save initial condition in solution list sol
-    sol_h = [h]
-    sol_v = [velocity(h,delta_x,n,rho,A,g)]
-    # First time step
-    surface = height(h, delta_x, delta_t, n, rho, A, g)
-    time = t_0 + delta_t
-
-    #TODO: boundary condition
-    # h=0 at the left and right boundary right now
-    surface = np.append(np.append([0],surface),[0])
-    sol_h.append(surface)
-    sol_v.append(velocity(surface, delta_x, n, rho, A, g))
-    
+    sol_h = [surface]
+    sol_v = [velocity(base,surface,boundary,delta_x,n,rho,A,g)]
+    Q=[flux(base, surface, boundary, delta_x, delta_t, n, rho, A, g)]
+    time = t_0 
     # Iterate through time and append solution to sol list
     while time<=t_0+(N-1)*delta_t:
         time = time + delta_t
-        surface = height(surface, delta_x, delta_t, n, rho, A, g)
-        surface = np.append(np.append([0],surface),[0])
-        sol_h.append(surface)
-        sol_v.append(velocity(surface, delta_x, n, rho, A, g))
-        
-    return [sol_h,sol_v]
+        sol_h.append(height(base,sol_h[len(sol_h)-1],boundary,a,delta_x,delta_t,n,rho,A,g))
+        sol_v.append(velocity(base,sol_h[len(sol_h)-1],boundary,delta_x,n,rho,A,g)) 
+        Q.append(flux(base, surface, boundary, delta_x, delta_t, n, rho, A, g))
+
+    return [sol_h,sol_v,Q]
