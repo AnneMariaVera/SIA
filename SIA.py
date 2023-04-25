@@ -23,9 +23,6 @@ Input variables:
     A           flow rate factor (Temp. dependent)
     g           gravity 
 """
-# TODO: Add boundary condition and base    
-# TODO: Add accumulation
-# TODO: Adjust for Flux
 
 import numpy as np
 
