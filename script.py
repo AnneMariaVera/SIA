@@ -30,8 +30,8 @@ boundary = np.array([0,-0.1])
 
 # time discretization
 t_0=0
-N=50000
-delta_t=2
+N=100000
+delta_t=10
 # ----------------------------     Elevation      ----------------------------
 #TODO: look for a better initial ice sheet
 base = np.zeros(np.size(bed))
@@ -44,7 +44,7 @@ h,v,Q = sia.solution(base,surface,boundary,a,delta_x,delta_t,t_0,N,n,rho,A,g)
 v_min = np.min(v[0])
 v_max = np.max(v[0])
 # create plots
-for i in range(0,len(h),100):
+for i in range(0,len(h),5000):
     fig , ax = plt.subplots(2)
     # create plot
     ax[0].plot(bed,surface,"k-")
