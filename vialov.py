@@ -15,8 +15,8 @@ Input:
 """
 
 import numpy as np
-def vialov(x,L,a,delta_x,n,A,rho,g):
+def vialov(x,L,a,n,A,rho,g):
     A_0=2*A*(rho*g)**n/(n+2)
-    h_0=2**(n/(n+2))*(a/A_0)**(1/(2*n+2))*L**(1/2)
+    h_0=2**(n/(2*n+2))*(a/A_0)**(1/(2*n+2))*L**(1/2)
     h = h_0*(1-(abs(x)/L)**((n+1)/n))**(n/(2*n+2))
     return h
