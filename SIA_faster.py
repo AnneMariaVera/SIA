@@ -63,15 +63,15 @@ def velocity_10(bed, surface, boundary, delta_x, n, end, coef):
         v_x = np.append(boundary[0,0]/H[0],v_x)
     return v_x
 
-def velocity_x_inner(bed, surface, delta_x,nz, n, end, coef):
+def velocity_x_inner(bed, surface,A,g,rho, delta_x,nz, n, end):
     # TODO: Think about grid in ice sheet (bottom to top)
     # Pattyn
     # Calculate the inner velocity
     # the velocity at the base is zero
     H = surface-bed    # ice thickness
     z = np.linspace(bed,surface,nz)
-    v_x_inner = -coef*np.array(
-        [((z[i][1:]-z[i][:end-1])/delta_x)**n*H[:end-1]**(n+1)
+    v_x_inner = 2*A/(n+1)*(rho*g)**n*np.array(
+        [((surface[1:]-surface[:end-1])/delta_x)**n*((surface[:end-1]-z[i][:end-1])**(n+1)-H[:end-1]**(n+1))
             for i in range(nz)])
     return v_x_inner,z
 
